@@ -16,7 +16,7 @@ events.on("pull_request", (e, p) => {
 
   // We're done configuring, so we run the job
   testJob.run()
-}
+})
 
 events.on("push", (e, p) => {
   var payload = JSON.parse(e.payload)
