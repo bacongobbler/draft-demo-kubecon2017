@@ -34,6 +34,8 @@ events.on("push", (e, p) => {
         "docker build ."
       ]
       buildJob.run()
+    } else {
+        console.log("skipping branch push events not on master.")
     }
   }
 })
