@@ -20,11 +20,29 @@ function test(e, project) {
 
 events.on("pull_request", test)
 
+events.on("push", (e, p) => {
+  var payload = JSON.parse(e.payload)
+
+  if (e.provider == "github") {
+    if (payload.ref == "refs/heads/master") {
+      var buildJob = new Job("docker:17.06.0-ce")
+
+      buildJob.docker.enabled = true
+
+      buildJob.tasks = [
+        "cd /src",
+        "docker build ."
+      ]
+      buildJob.run()
+    }
+  }
+})
+
 events.on("imagePush", (e, p) => {
   console.log(e.payload)
   var m = "New image pushed"
 
-  if (project.secrets.SLACK_WEBHOOK) {
+  if (p.secrets.SLACK_WEBHOOK) {
     var slack = new Job("slack-notify")
 
     slack.image = "technosophos/slack-notify:latest"
