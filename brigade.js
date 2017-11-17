@@ -1,6 +1,6 @@
 const { events, Job, Group} = require("brigadier")
 
-function test(e, project) {
+events.on("pull_request", (e, p) => {
   // Create a new job
   var testJob = new Job("test-runner")
 
@@ -17,8 +17,6 @@ function test(e, project) {
   // We're done configuring, so we run the job
   testJob.run()
 }
-
-events.on("pull_request", test)
 
 events.on("push", (e, p) => {
   var payload = JSON.parse(e.payload)
