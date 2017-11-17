@@ -1,5 +1,7 @@
 const { events, Job, Group} = require("brigadier")
 
+const testEventTypes = ["pull_request", "push"]
+
 function test(e, project) {
   // Create a new job
   var testJob = new Job("test-runner")
@@ -18,8 +20,16 @@ function test(e, project) {
   testJob.run()
 }
 
-events.on("push", test)
-events.on("pull_request", test)
+function handler() {
+  testEventTypes.forEach(function(eventType) {
+    events.removeAllListeners(eventType)
+  })
+  test()
+}
+
+testEventTypes.forEach(function(eventType) {
+  events.on(eventType, handler)
+})
 
 events.on("imagePush", (e, p) => {
   console.log(e.payload)
