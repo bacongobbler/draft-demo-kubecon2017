@@ -25,7 +25,7 @@ events.on("push", (e, p) => {
     if (payload.ref == "refs/heads/master") {
       var buildJob = new Job("docker-build")
 
-      buildJob.image = ""docker:17.06.0-ce"
+      buildJob.image = "docker:17.06.0-ce"
 
       buildJob.docker.enabled = true
 
