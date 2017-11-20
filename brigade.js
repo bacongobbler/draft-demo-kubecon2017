@@ -24,14 +24,17 @@ events.on("push", (e, p) => {
   if (e.provider == "github") {
     if (payload.ref == "refs/heads/master") {
       var buildJob = new Job("docker-build")
+      buildJob.env = {
+        "IMAGE_NAME": [p.secrets.DOCKER_REGISTRY, "draft-demo-kubecon2017"].join("/")
+      }
 
       buildJob.image = "docker:17.06.0-ce"
-
       buildJob.docker.enabled = true
-
       buildJob.tasks = [
         "cd /src",
-        "docker build ."
+        "IMAGE_ID=$(docker build --quiet .)",
+        "docker tag $IMAGE_ID $IMAGE_NAME",
+        "docker push $IMAGE_NAME"
       ]
       buildJob.run()
     } else {
@@ -49,10 +52,10 @@ events.on("imagePush", (e, p) => {
 
     slack.image = "technosophos/slack-notify:latest"
     slack.env = {
-      SLACK_WEBHOOK: project.secrets.SLACK_WEBHOOK,
+      SLACK_WEBHOOK: p.secrets.SLACK_WEBHOOK,
       SLACK_USERNAME: "KubeConBot",
       SLACK_TITLE: "DockerHub Image",
-      SLACK_MESSAGE: m + " <https://" + project.repo.name + ">",
+      SLACK_MESSAGE: m + " <https://" + p.repo.name + ">",
       SLACK_COLOR: "#00ff00"
     }
 
