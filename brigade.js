@@ -24,7 +24,6 @@ events.on("pull_request", (e, p) => {
 
 events.on("push", (e, p) => {
   var payload = JSON.parse(e.payload)
-  console.log(e.payload)
 
   if (e.provider == "github") {
     if (payload.ref == "refs/heads/master") {
@@ -54,7 +53,6 @@ events.on("push", (e, p) => {
 events.on("imagePush", (e, p) => {
   var imageName = [p.secrets.DOCKER_REGISTRY, name].join("/")
   var payload = JSON.parse(e.payload)
-  console.log(e.payload)
 
   if (payload.action != "push") {
     console.log(`ignoring action ${payload.action}`)
@@ -69,7 +67,6 @@ events.on("imagePush", (e, p) => {
 
   var helm = new Job("helm", "lachlanevenson/k8s-helm:" + helmTag)
   helm.tasks = [
-    "helm template /src/charts/uuid-generator",
     "helm upgrade --reuse-values --set image.tag='" + version + "',image.repository='" + imageName + "' " + name + " /src/charts/uuid-generator"
   ]
 
