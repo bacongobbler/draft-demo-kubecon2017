@@ -1,5 +1,8 @@
 const { events, Job, Group} = require("brigadier")
 
+// This is the tiller version that is running in the cluster
+const helmTag = "v2.7.2"
+
 events.on("pull_request", (e, p) => {
   // Create a new job
   var testJob = new Job("test-runner")
@@ -47,24 +50,40 @@ events.on("push", (e, p) => {
 })
 
 events.on("imagePush", (e, p) => {
+  var payload = JSON.parse(e.payload)
   console.log(e.payload)
-  var m = "New image pushed"
 
-  if (p.secrets.SLACK_WEBHOOK) {
-    var slack = new Job("slack-notify")
-
-    slack.image = "technosophos/slack-notify:latest"
-    slack.env = {
-      SLACK_WEBHOOK: p.secrets.SLACK_WEBHOOK,
-      SLACK_USERNAME: "KubeConBot",
-      SLACK_TITLE: "DockerHub Image",
-      SLACK_MESSAGE: m + " <https://" + p.repo.name + ">",
-      SLACK_COLOR: "#00ff00"
-    }
-
-    slack.tasks = ["/slack-notify"]
-    slack.run()
-  } else {
-    console.log(m)
+  if (payload.action != "push") {
+    console.log(`ignoring action ${payload.action}`)
+    return
   }
+
+  var version = payload.target.tag || "latest"
+  if (version == "latest") {
+    console.log("ignoring 'latest'")
+    return
+  }
+
+  var helm = new Job("helm", "lachlanevenson/k8s-helm:" + helmTag)
+  helm.tasks = [
+    "ls /src",
+    "helm upgrade --reuse-values --set tag=" + version + " --install " + name + " /src/charts/uuid-generator"
+  ]
+
+  helm.run().then( result => {
+    var message = ":helm: upgraded " + name
+    if (p.secrets.SLACK_WEBHOOK) {
+      var slack = new Job("slack-notify", "technosophos/slack-notify:latest", ["/slack-notify"])
+      slack.env = {
+        SLACK_WEBHOOK: p.secrets.SLACK_WEBHOOK,
+        SLACK_USERNAME: "KubeConBot",
+        SLACK_TITLE: message,
+        SLACK_MESSAGE: result.toString(),
+        SLACK_COLOR: "#00ff00"
+      }
+      slack.run()
+    } else {
+      console.log(message)
+    }
+  })
 })
