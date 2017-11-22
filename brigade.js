@@ -24,6 +24,7 @@ events.on("pull_request", (e, p) => {
 
 events.on("push", (e, p) => {
   var payload = JSON.parse(e.payload)
+  console.log(e.payload)
 
   if (e.provider == "github") {
     if (payload.ref == "refs/heads/master") {
