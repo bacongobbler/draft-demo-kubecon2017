@@ -2,6 +2,7 @@ const { events, Job, Group} = require("brigadier")
 
 // This is the tiller version that is running in the cluster
 const helmTag = "v2.7.2"
+const name = "draft-demo-kubecon2017"
 
 events.on("pull_request", (e, p) => {
   // Create a new job
@@ -28,7 +29,7 @@ events.on("push", (e, p) => {
     if (payload.ref == "refs/heads/master") {
       var buildJob = new Job("docker-build")
       buildJob.env = {
-        "IMAGE_NAME": [p.secrets.DOCKER_REGISTRY, "draft-demo-kubecon2017"].join("/"),
+        "IMAGE_NAME": [p.secrets.DOCKER_REGISTRY, name+":git-"+payload.head].join("/"),
         "DOCKER_REGISTRY": p.secrets.DOCKER_REGISTRY,
         "DOCKER_USER": p.secrets.DOCKER_USER,
         "DOCKER_PASS": p.secrets.DOCKER_PASS,
@@ -50,6 +51,7 @@ events.on("push", (e, p) => {
 })
 
 events.on("imagePush", (e, p) => {
+  var imageName = [p.secrets.DOCKER_REGISTRY, name].join("/")
   var payload = JSON.parse(e.payload)
   console.log(e.payload)
 
@@ -67,7 +69,7 @@ events.on("imagePush", (e, p) => {
   var helm = new Job("helm", "lachlanevenson/k8s-helm:" + helmTag)
   helm.tasks = [
     "ls /src",
-    "helm upgrade --reuse-values --set tag=" + version + " --install " + name + " /src/charts/uuid-generator"
+    "helm upgrade --reuse-values --set image.tag='" + version + "',image.repository='" + imageName + "',service.type='Loadbalancer' --install " + name + " /src/charts/uuid-generator"
   ]
 
   helm.run().then( result => {

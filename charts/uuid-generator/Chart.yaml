@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A web application that responds with unique UUIDs
+name: uuid-generator
+version: v0.1.0
