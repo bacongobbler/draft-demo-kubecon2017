@@ -29,7 +29,7 @@ events.on("push", (e, p) => {
     if (payload.ref == "refs/heads/master") {
       var buildJob = new Job("docker-build")
       buildJob.env = {
-        "IMAGE_NAME": [p.secrets.DOCKER_REGISTRY, name+":git-"+payload.head].join("/"),
+        "IMAGE_NAME": [p.secrets.DOCKER_REGISTRY, name+":git-"+payload.after].join("/"),
         "DOCKER_REGISTRY": p.secrets.DOCKER_REGISTRY,
         "DOCKER_USER": p.secrets.DOCKER_USER,
         "DOCKER_PASS": p.secrets.DOCKER_PASS,
