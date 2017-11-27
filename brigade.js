@@ -7,6 +7,21 @@ const name = "draft-demo-kubecon2017"
 events.on("push", (e, p) => {
   var payload = JSON.parse(e.payload)
 
+  // Create a new job
+  var testJob = new Job("test-runner")
+
+  // We want our job to run the stock Docker Python 2 image
+  testJob.image = "python:2"
+
+  // Now we want it to run these commands in order:
+  testJob.tasks = [
+    "cd /src",
+    "pip install -r requirements.txt",
+    "python setup.py test"
+  ]
+
+  var jobGroup = new Group([testJob])
+
   if (e.provider == "github") {
     if (payload.ref == "refs/heads/master") {
       var buildJob = new Job("docker-build")
@@ -25,11 +40,14 @@ events.on("push", (e, p) => {
         "docker build -t $IMAGE_NAME .",
         "docker push $IMAGE_NAME"
       ]
-      buildJob.run()
+      jobGroup.add(buildJob)
     } else {
         console.log("skipping branch push events not on master.")
     }
   }
+
+  // We're done configuring, so we run the job(s) in parallel
+  jobGroup.runAll()
 })
 
 events.on("imagePush", (e, p) => {
