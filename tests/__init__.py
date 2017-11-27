@@ -1,12 +1,12 @@
 import unittest
 import uuid
 
-import app
+import uuidgen
 
 class AppTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.client = app.app.test_client()
+        self.client = uuidgen.app.test_client()
 
     def test_uuid_generated(self):
         resp = self.client.get('/')
