@@ -1,6 +1,6 @@
 replicaCount: 3
 image:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 service:
   name: http
   type: LoadBalancer
