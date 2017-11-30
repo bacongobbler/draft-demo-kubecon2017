@@ -1,6 +1,6 @@
 [environments]
   [environments.development]
-    name = "odd-otter"
+    name = "draft-demo-kubecon2017"
     namespace = "default"
     wait = false
     watch = false
