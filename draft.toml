@@ -1,6 +1,6 @@
 [environments]
   [environments.development]
-    name = "sad-otter"
+    name = "happy-otter"
     namespace = "default"
     wait = false
     watch = false
