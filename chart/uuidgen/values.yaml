@@ -4,5 +4,5 @@ image:
 service:
   name: http
   type: LoadBalancer
-  externalPort: 8000
+  externalPort: 80
   internalPort: 8000
