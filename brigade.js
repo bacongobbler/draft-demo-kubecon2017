@@ -67,7 +67,7 @@ events.on("imagePush", (e, p) => {
 
   var helm = new Job("helm", "lachlanevenson/k8s-helm:" + helmTag)
   helm.tasks = [
-    "helm upgrade --reuse-values --set image.tag='" + version + "',image.repository='" + imageName + "' " + name + " /src/chart/uuidgen"
+    "helm upgrade --set image.tag='" + version + "',image.repository='" + imageName + "' " + name + " /src/chart/uuidgen"
   ]
 
   helm.run().then( result => {
