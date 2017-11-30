@@ -3,6 +3,6 @@ image:
   pullPolicy: IfNotPresent
 service:
   name: http
-  type: ClusterIP
+  type: LoadBalancer
   externalPort: 8000
   internalPort: 8000
