@@ -79,7 +79,7 @@ events.on("imagePush", (e, p) => {
         SLACK_USERNAME: "KubeConBot",
         SLACK_TITLE: message,
         SLACK_MESSAGE: result.toString(),
-        SLACK_COLOR: "#00ff00"
+        SLACK_COLOR: "#chucknorris"
       }
       slack.run()
     } else {
